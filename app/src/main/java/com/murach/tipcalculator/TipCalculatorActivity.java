@@ -1,9 +1,11 @@
 package com.murach.tipcalculator;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -57,8 +59,8 @@ implements OnEditorActionListener, OnClickListener {
         // get default SharedPreferences object
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
+        //note: this won't create the database since it doesn't call openReadableDB/openWriteableDB
         tipDB = new TipDB(this);
-
     }
     
     @Override
@@ -85,6 +87,17 @@ implements OnEditorActionListener, OnClickListener {
         
         // calculate and display
         calculateAndDisplay();
+
+        // assignment requirement 3: call the getTips method and loops through all saved tips.
+        // For each saved tip, this code should use LogCat logging to send the
+        // bill date milliseconds, the bill amount, and the tip percent to the LogCat view.
+        ArrayList<Tip> tips = tipDB.getTips();
+        for (Tip currTip : tips) {
+            Log.d("TipsCalc", "Tip id " + currTip.getId() + " contains date milliseconds: " + currTip.getDateMillis() + ", bill amount: "
+                                + currTip.getBillAmount() + ", tip percent in decimal form: " + currTip.getTipPercent());
+        }
+
+
     }
     
     public void calculateAndDisplay() {        
