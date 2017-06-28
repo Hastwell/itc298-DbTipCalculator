@@ -2,24 +2,28 @@ package com.murach.tipcalculator;
 
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 
 public class TipDB {
 
-    //
+    //database constants
     public static final String DB_NAME = "tipcalculator.db";
     public static final int DB_VERSION = 1;
 
-
+    //table constant
     public static final String TIP_TABLE = "tip";
 
+    //column constants
     public static final String TIP_ID = "_id";
     public static final int TIP_ID_COL = 0;
 
-    public static final String BILL_DATE = "bill_date";
+    public static final String BILL_DATE = "bill_date_millis";
     public static final int BILL_DATE_COL = 1;
 
     public static final String BILL_AMOUNT = "bill_amount";
@@ -28,10 +32,11 @@ public class TipDB {
     public static final String TIP_PERCENT = "tip_percent";
     public static final int TIP_PERCENT_COL = 3;
 
+    //db command constants
     public static final String CREATE_TIP_TABLE =
             "CREATE TABLE " + TIP_TABLE + " (" +
                     TIP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    BILL_DATE + " TEXT NOT NULL, " +
+                    BILL_DATE + " INTEGER NOT NULL, " +
                     BILL_AMOUNT + " REAL NOT NULL, " +
                     TIP_PERCENT + " REAL NOT NULL);";
 
@@ -43,7 +48,7 @@ public class TipDB {
 
     public TipDB(Context context){
 
-        Log.d("Tip", "Inside TipDB constructor");
+        Log.d("TipsCalc", "Inside TipDB constructor");
         dbHelper = new DBHelper(context, DB_NAME, null, DB_VERSION);
     }
 
@@ -60,10 +65,36 @@ public class TipDB {
             db.close();
     }
 
+//    Add a public getTips method that returns an ArrayList<Tip> object that contains all columns and rows from the database table.
+    public ArrayList<Tip> getTips() {
+
+        this.openReadableDB();
+        Cursor cursor =  db.query(TIP_TABLE, null, null, null, null, null, null);
+        ArrayList<Tip> tips = new ArrayList<Tip>();
+        while (cursor.moveToNext()) {
+            tips.add(getTipFromCursor(cursor));
+        }
+        return tips;
+    }
+
+    private static Tip getTipFromCursor(Cursor cursor) {
+        if (cursor == null || cursor.getCount() <= 0)
+            return null;
+
+        try {
+            Tip tip = new Tip(
+                            cursor.getInt(TIP_ID_COL)
+                            ,cursor.getInt(BILL_DATE_COL)
+                            ,cursor.getLong(BILL_AMOUNT_COL)
+                            ,cursor.getLong(TIP_PERCENT_COL));
+            return tip;
+        } catch (Exception e) {
+            return null;
+        }
+    }
     /**
      * Created by Conference4 on 6/26/2017.
      */
-
     private static class DBHelper extends SQLiteOpenHelper {
 
         public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -75,17 +106,17 @@ public class TipDB {
 
             db.execSQL(CREATE_TIP_TABLE);
 
-            db.execSQL("INSERT INTO " + TIP_TABLE + " VALUES ('0', 100.00, 0.2)");
-            db.execSQL("INSERT INTO " + TIP_TABLE + " VALUES ('1', 10.98, 0.15)");
+            db.execSQL("INSERT INTO " + TIP_TABLE + " VALUES (1, 0, 100.00, 0.2)");
+            db.execSQL("INSERT INTO " + TIP_TABLE + " VALUES (2, 1, 10.98, 0.15)");
 
-            Log.d("Tip", "Database created");
+            Log.d("TipsCalc", "Database created");
 
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-            Log.d("Tip", "Upgrading db from version " + oldVersion + " to " + newVersion);
+            Log.d("TipsCalc", "Upgrading db from version " + oldVersion + " to " + newVersion);
 
             db.execSQL(TipDB.DROP_TIP_TABLE);
             onCreate(db);
