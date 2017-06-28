@@ -74,6 +74,11 @@ public class TipDB {
         while (cursor.moveToNext()) {
             tips.add(getTipFromCursor(cursor));
         }
+        //close db connections
+        if (cursor != null)
+            cursor.close();
+        this.closeDB();
+
         return tips;
     }
 
