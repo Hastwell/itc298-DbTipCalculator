@@ -30,6 +30,7 @@ implements OnEditorActionListener, OnClickListener {
     private Button   percentDownButton;
     private TextView tipTextView;
     private TextView totalTextView;
+    private Button saveTipButton;
     
     // define instance variables that should be saved
     private String billAmountString = "";
@@ -50,11 +51,13 @@ implements OnEditorActionListener, OnClickListener {
         percentDownButton = (Button) findViewById(R.id.percentDownButton);
         tipTextView = (TextView) findViewById(R.id.tipTextView);
         totalTextView = (TextView) findViewById(R.id.totalTextView);
+        saveTipButton = (Button) findViewById(R.id.saveTipButton);
 
         // set the listeners
         billAmountEditText.setOnEditorActionListener(this);
         percentUpButton.setOnClickListener(this);
         percentDownButton.setOnClickListener(this);
+        saveTipButton.setOnClickListener(this);
         
         // get default SharedPreferences object
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -99,7 +102,31 @@ implements OnEditorActionListener, OnClickListener {
 
 
     }
-    
+
+    public void saveTip(){
+
+
+        billAmountString = billAmountEditText.getText().toString();
+        float billAmount;
+        if (billAmountString.equals("")) {
+            billAmount = 0;
+        }
+        else {
+            billAmount = Float.parseFloat(billAmountString);
+        }
+
+        Tip tip = new Tip(System.currentTimeMillis(),billAmount, tipPercent);
+
+        this.tipDB.insertTip(tip);
+
+        this.clearUI();
+
+    }
+
+    public void clearUI(){
+        billAmountEditText.setText("");
+    }
+
     public void calculateAndDisplay() {        
 
         // get the bill amount
@@ -145,6 +172,12 @@ implements OnEditorActionListener, OnClickListener {
             tipPercent = tipPercent + .01f;
             calculateAndDisplay();
             break;
+
+            case R.id.saveTipButton:
+                saveTip();
+                break;
+
+
         }
     }
 }

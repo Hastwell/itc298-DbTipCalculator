@@ -21,10 +21,17 @@ public class Tip {
     }
 
     public Tip(long id, long dateMillis, float billAmount, float tipPercent) {
-        this.setId(id);
-        this.setDateMillis(dateMillis);
-        this.setBillAmount(billAmount);
-        this.setTipPercent(tipPercent);
+		this.setId(id);
+		this.setDateMillis(dateMillis);
+		this.setBillAmount(billAmount);
+		this.setTipPercent(tipPercent);
+	}
+
+		public Tip( long dateMillis, float billAmount, float tipPercent) {
+
+			this.setDateMillis(dateMillis);
+			this.setBillAmount(billAmount);
+			this.setTipPercent(tipPercent);
     }
 
 	public long getId() {

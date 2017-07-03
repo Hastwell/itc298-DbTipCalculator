@@ -1,6 +1,7 @@
 package com.murach.tipcalculator;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -63,6 +64,22 @@ public class TipDB {
     private void closeDB() {
         if (db != null)
             db.close();
+    }
+
+    //add a method to insert new tips into the db
+
+    public long insertTip(Tip tip){
+        ContentValues cv = new ContentValues();
+        cv.put(BILL_DATE, tip.getDateMillis());
+        cv.put(TIP_PERCENT, tip.getTipPercent());
+        cv.put(BILL_AMOUNT, tip.getBillAmount());
+
+        Log.d(TipDB.class.getName(), "Adding tip on timestamp " + tip.getDateMillis() + " for " + tip.getBillAmountFormatted() + " with " + tip.getTipPercentFormatted() + " tip");
+
+        this.openWriteableDB();
+        long rowID = db.insert(TIP_TABLE, null, cv);
+        this.closeDB();
+        return rowID;
     }
 
 //    Add a public getTips method that returns an ArrayList<Tip> object that contains all columns and rows from the database table.
